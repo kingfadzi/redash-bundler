@@ -85,6 +85,9 @@ if ! command -v poetry &> /dev/null; then
   exit 1
 fi
 
+# Install poetry export plugin (required for Poetry 2.x)
+poetry self add poetry-plugin-export 2>/dev/null || pip install poetry-plugin-export >/dev/null 2>&1 || true
+
 # Export requirements from poetry
 cd "$SRC_DIR"
 poetry export -f requirements.txt -o requirements.txt --without-hashes
