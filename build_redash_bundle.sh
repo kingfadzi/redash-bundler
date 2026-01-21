@@ -93,6 +93,10 @@ poetry export -f requirements.txt -o requirements.txt --without-hashes
 # Strip Python version markers (Redash specifies <3.11 but we need to work with 3.11)
 # This removes "; python_version..." suffixes from requirements
 sed -i 's/ *; *python_version.*//g' requirements.txt
+
+# Fix greenlet version for Python 3.11 (gevent 23.9.1 on py311 needs greenlet>=3.0)
+sed -i 's/^greenlet==2\.0\.2/greenlet>=3.0.0/' requirements.txt
+
 echo "  Exported $(wc -l < requirements.txt) requirements"
 
 # Create venv for building wheels
