@@ -79,14 +79,11 @@ echo
 # ---- Step 3: Export Python dependencies and build wheels ----
 echo "[3/6] Building Python wheelhouse..."
 
-# Check for poetry
+# Check for poetry (install 1.x if not present - 2.x has compatibility issues)
 if ! command -v poetry &> /dev/null; then
-  echo "ERROR: poetry is required but not found"
-  exit 1
+  echo "  Installing Poetry 1.8.x..."
+  pip install "poetry>=1.8,<2.0" --quiet
 fi
-
-# Install poetry export plugin (required for Poetry 2.x)
-poetry self add poetry-plugin-export 2>/dev/null || pip install poetry-plugin-export >/dev/null 2>&1 || true
 
 # Export requirements from poetry
 cd "$SRC_DIR"
