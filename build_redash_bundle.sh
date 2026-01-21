@@ -92,19 +92,28 @@ poetry export -f requirements.txt -o requirements.txt --without-hashes
 # Create venv for building wheels
 "$PYTHON_VERSION" -m venv "$WORKDIR/venv"
 source "$WORKDIR/venv/bin/activate"
-python -m pip install --upgrade pip wheel setuptools --quiet
+python -m pip install --upgrade pip wheel setuptools
 
 mkdir -p "$WHEEL_DIR"
 
 # Download all wheels
 echo "  Downloading wheels..."
-python -m pip download -r requirements.txt -d "$WHEEL_DIR" --quiet
+python -m pip download -r requirements.txt -d "$WHEEL_DIR"
+
+# Verify wheels were downloaded
+WHEEL_COUNT=$(find "$WHEEL_DIR" -name "*.whl" | wc -l)
+echo "  Downloaded $WHEEL_COUNT wheel files"
+
+if [[ "$WHEEL_COUNT" -eq 0 ]]; then
+  echo "ERROR: No wheels were downloaded!"
+  exit 1
+fi
 
 # Build wheels for any sdists (so target doesn't need to compile)
 SDISTS=$(find "$WHEEL_DIR" -maxdepth 1 -type f \( -name "*.tar.gz" -o -name "*.zip" \) 2>/dev/null || true)
 if [[ -n "${SDISTS}" ]]; then
   echo "  Building wheels from source distributions..."
-  python -m pip wheel -r requirements.txt -w "$WHEEL_DIR" --quiet
+  python -m pip wheel -r requirements.txt -w "$WHEEL_DIR"
   # Remove sdists, keep only wheels
   rm -f "$WHEEL_DIR"/*.tar.gz "$WHEEL_DIR"/*.zip 2>/dev/null || true
 fi
