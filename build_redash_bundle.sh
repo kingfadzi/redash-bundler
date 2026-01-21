@@ -17,6 +17,7 @@ set -euo pipefail
 # ---- Configuration ----
 REDASH_GIT_URL="${REDASH_GIT_URL:-https://github.com/getredash/redash.git}"
 REDASH_REF="${REDASH_REF:-v25.8.0}"
+# NOTE: Redash v25.8.0 requires Python >=3.8,<3.11 (Python 3.11 is NOT supported)
 PYTHON_VERSION="${PYTHON_VERSION:-python3.10}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
