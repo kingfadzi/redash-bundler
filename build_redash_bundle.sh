@@ -66,12 +66,14 @@ if ! command -v yarn &> /dev/null; then
   exit 1
 fi
 
-export NODE_ENV=production
 export NODE_OPTIONS="--openssl-legacy-provider"
 
 # Use network-concurrency 1 to avoid cache corruption in containers
+# Don't set NODE_ENV=production during install (need devDependencies for build)
 yarn install --network-concurrency 1
-yarn build
+
+# Now build with production mode
+NODE_ENV=production yarn build
 echo
 
 # ---- Step 3: Export Python dependencies and build wheels ----
