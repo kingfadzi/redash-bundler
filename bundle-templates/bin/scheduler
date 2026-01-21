@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+source "$(dirname "$0")/common.sh"
+
+need REDASH_DATABASE_URL
+need REDASH_REDIS_URL
+need REDASH_SECRET_KEY
+
+ensure_venv
+cd "$APP_DIR"
+exec "$VENV_DIR/bin/python" manage.py rq scheduler
