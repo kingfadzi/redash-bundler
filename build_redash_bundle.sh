@@ -67,6 +67,12 @@ if ! command -v yarn &> /dev/null; then
   exit 1
 fi
 
+# Check for Python dev headers (needed for wheel building)
+if [[ ! -f /usr/include/python3.11/Python.h ]] && [[ ! -f /usr/include/python3.10/Python.h ]]; then
+  echo "WARNING: Python development headers not found. Some wheels may fail to build."
+  echo "         Install python3.11-devel or python3.10-devel"
+fi
+
 export NODE_OPTIONS="--openssl-legacy-provider"
 
 # Use network-concurrency 1 to avoid cache corruption in containers
