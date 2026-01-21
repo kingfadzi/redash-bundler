@@ -68,7 +68,9 @@ fi
 
 export NODE_ENV=production
 export NODE_OPTIONS="--openssl-legacy-provider"
-yarn install --frozen-lockfile
+
+# Use network-concurrency 1 to avoid cache corruption in containers
+yarn install --network-concurrency 1
 yarn build
 echo
 
