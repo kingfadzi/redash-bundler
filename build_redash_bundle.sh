@@ -17,8 +17,8 @@ set -euo pipefail
 # ---- Configuration ----
 REDASH_GIT_URL="${REDASH_GIT_URL:-https://github.com/getredash/redash.git}"
 REDASH_REF="${REDASH_REF:-v25.8.0}"
-# NOTE: Redash v25.8.0 requires Python >=3.8,<3.11 (Python 3.11 is NOT supported)
-PYTHON_VERSION="${PYTHON_VERSION:-python3.10}"
+# NOTE: Redash officially requires Python >=3.8,<3.11, but we strip markers to allow 3.11
+PYTHON_VERSION="${PYTHON_VERSION:-python3.11}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Sanitize ref for filename (replace / with -)
@@ -89,6 +89,11 @@ fi
 # Export requirements from poetry
 cd "$SRC_DIR"
 poetry export -f requirements.txt -o requirements.txt --without-hashes
+
+# Strip Python version markers (Redash specifies <3.11 but we need to work with 3.11)
+# This removes "; python_version..." suffixes from requirements
+sed -i 's/ *; *python_version.*//g' requirements.txt
+echo "  Exported $(wc -l < requirements.txt) requirements"
 
 # Create venv for building wheels
 "$PYTHON_VERSION" -m venv "$WORKDIR/venv"
