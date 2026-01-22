@@ -15,9 +15,9 @@ The bundle can be deployed on an air-gapped system: extract, configure, run.
 ## Build Requirements (Build Machine)
 
 - Alma 9 / RHEL 9 / UBI 9 (or compatible)
-- Python 3.10
-- Node.js 16+ and Yarn
-- Poetry
+- Python 3.11 (or 3.10)
+- Node.js 18+ and Yarn
+- Poetry 1.8.x
 - Git, rsync
 
 ## Quick Start
@@ -44,6 +44,9 @@ REDASH_GIT_URL=https://github.com/yourfork/redash.git ./build_redash_bundle.sh
 
 # Custom output name
 OUT_TGZ=my-redash.tgz ./build_redash_bundle.sh
+
+# Use Python 3.10 instead of 3.11
+PYTHON_VERSION=python3.10 ./build_redash_bundle.sh
 ```
 
 ## Deploy (Target Machine)
@@ -51,13 +54,13 @@ OUT_TGZ=my-redash.tgz ./build_redash_bundle.sh
 ### Prerequisites
 
 - UBI 9 / RHEL 9 / Alma 9
-- Python 3.10
+- Python 3.11 (or 3.10)
 - PostgreSQL (external or local)
 - Redis (external or local)
 
 ```bash
 # UBI 9 minimal packages
-sudo dnf install -y python3.10 postgresql-libs
+sudo dnf install -y python3.11 postgresql-libs
 ```
 
 ### Install
@@ -99,8 +102,33 @@ Edit `redash.env`:
 | `REDASH_REDIS_URL` | Yes | Redis connection string |
 | `REDASH_COOKIE_SECRET` | Yes | Random string for session cookies |
 | `REDASH_SECRET_KEY` | Yes | Random string for encryption |
+| `REDASH_HOST` | No | Public URL (e.g., https://redash.example.com) |
+| `REDASH_LOG_LEVEL` | No | Logging level (default: INFO) |
 | `REDASH_WEB_WORKERS` | No | Gunicorn workers (default: 4) |
+| `REDASH_GUNICORN_TIMEOUT` | No | Request timeout in seconds (default: 60) |
 | `REDASH_BIND` | No | Bind address (default: 0.0.0.0:5000) |
+| `REDASH_ADDITIONAL_QUERY_RUNNERS` | No | Comma-separated list of extra data sources |
+
+## Enabling SQL Server (Optional)
+
+To connect to Microsoft SQL Server, install the ODBC driver on the target machine:
+
+```bash
+# Install unixODBC
+sudo dnf install -y unixODBC
+
+# Add Microsoft repository and install ODBC Driver 18
+sudo curl https://packages.microsoft.com/config/rhel/9/prod.repo -o /etc/yum.repos.d/mssql-release.repo
+sudo ACCEPT_EULA=Y dnf install -y msodbcsql18
+```
+
+Then add to `redash.env`:
+
+```bash
+REDASH_ADDITIONAL_QUERY_RUNNERS=redash.query_runner.mssql_odbc
+```
+
+Restart the Redash services for the changes to take effect.
 
 ## Bundle Structure
 
